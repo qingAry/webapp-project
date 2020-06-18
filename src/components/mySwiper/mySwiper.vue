@@ -1,14 +1,11 @@
 <template>
     <div class="swiper-container" ref="swiperContainer">
       <div class="swiper-wrapper">
-          <div class="swiper-slide">
-            <img src="../../assets/images/banner-2.jpg" alt="">
-          </div>
-          <div class="swiper-slide">
-            <img src="../../assets/images/1617045_1_1_wap_727631487696e9635e5d3e33371b20f9.jpg" alt="">
-          </div>
-          <div class="swiper-slide">
-            <img src="../../assets/images/1617045_1_1_wap_727631487696e9635e5d3e33371b20f9.jpg" alt="">
+          <div class="swiper-slide"
+               v-for="(bannerItemUrl,index) in bannerList"
+               :key="index"
+          >
+            <img :src="bannerItemUrl" alt="">
           </div>
       </div>
       <!-- 如果需要分页器 -->
@@ -19,11 +16,14 @@
 <script type="text/ecmascript-6">
   import Swiper from 'swiper'
   export default {
+     props:{
+       bannerList:Array
+     },
      mounted() {
        new Swiper (this.$refs.swiperContainer, {
           // direction: 'vertical', // 垂直切换选项
           loop: true, // 循环模式选项
-          
+          autoplay:true,
           // 如果需要分页器
           pagination: {
             el: '.swiper-pagination',

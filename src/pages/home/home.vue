@@ -17,14 +17,14 @@
     <div class="home-nav">
       <template>
         <div class="nav-wrapper" ref="navScroll">
-          <div class="nav-content">
+          <div class="nav-content" v-if="indexDatas.kingKongModule">
             <div class="nav-item" 
-            v-for="(cateNavItem,index) in cateNavDatasList"
-            :key="cateNavItem.id"
+            v-for="(navItem,index) in indexDatas.kingKongModule.kingKongList"
+            :key="index"
             :class="{active:currentIndex === index}"
             @click="changeIndex(index)"
             >
-              <span>{{cateNavItem.name}}</span>
+              <span>{{navItem.text}}</span>
             </div>
           </div>
         </div>
@@ -35,29 +35,46 @@
       </div>
     </div>
     <!-- 首页商品页面的展示 -->
-    <Recommend></Recommend>
+    <!-- <Recommend :indexDatas="indexDatas"></Recommend> -->
+    <CategoryList></CategoryList>
   </div>
 </template>
 
 <script type="text/ecmascript-6">
   import BScroll from '@better-scroll/core'
-  import { reqCateNavDatas } from '../../utils/index'
+  import { reqCateNavDatas,reqIndexDatas } from '../../utils/index'
   import Recommend from '../../components/recommend/recommend'
+  import CategoryList from '../../components/categoryList/categoryList'
   export default {
     components:{
-      Recommend
+      Recommend,
+      CategoryList
     },
     data(){
       return {
+        indexDatas:{},
         cateNavDatasList:[],
         currentIndex:0,
         isShow:false
       }
     },
     mounted() {
-        // 滚轮
-        this.initScroll()
         this.getCateNavDatas()
+        // 获取首页信息
+        this.getIndexDatas()
+        // 滚轮
+        // this.$nextTick(() => {
+        //   console.log('............',this.indexDatas)
+        //   this.initScroll()
+        // // })
+    },
+    watch: {
+      indexDatas:function(){
+        this.$nextTick(() => {
+          // console.log('............',this.indexDatas)
+          this.initScroll()
+        })
+      }
     },
     methods: {
       // 滚动
@@ -68,20 +85,25 @@
           probeType: 3
         })
         this.hadleHooks(['scroll', 'scrollEnd'], (pos) => {
-          console.log('滚动了')
+          // console.log('滚动了')
         })
-      },
-      
-      //发送请求 获取导航栏数据
-      async getCateNavDatas (){
-        let result = await reqCateNavDatas()
-        // console.log(result.categoryL1List)
-        this.cateNavDatasList = result.categoryL1List
       },
       hadleHooks(hookNames, handler) {
         hookNames.forEach((name) => {
           this.bs.on(name, handler)
         })
+      },
+      // 发送请求获取首页信息
+      async getCateNavDatas (){
+        let result = await reqCateNavDatas()
+        // console.log(result.categoryL1List)
+        this.cateNavDatasList = result.categoryL1List
+      },
+      //发送请求 获取导航栏数据
+      async getIndexDatas (){
+        let result = await reqIndexDatas()
+        // console.log(result.kingKongModule.kingKongList)
+        this.indexDatas = result
       },
       changeIndex(index){
         console.log('改变')
@@ -165,10 +187,11 @@
           text-align center
           padding 0 10px
           margin 0 10px
+          margin-bottom 5px
           span
             font-size 28px
           &.active
-            border-bottom 1px solid #dd1a21
+            border-bottom 4px solid #dd1a21
       .nav-box
         position absolute
         left 0
